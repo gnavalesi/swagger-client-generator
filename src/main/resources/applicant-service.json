@@ -1,0 +1,2345 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Descripcion de API Applicants",
+    "version": "0.0.1",
+    "title": "API Jobs Applicants Developer",
+    "termsOfService": "URL a Terminos y condiciones",
+    "contact": {
+      "name": "jobs-core@navent.com"
+    },
+    "license": {
+      "name": "Tipo de licencia",
+      "url": "URL a la licencia"
+    }
+  },
+  "host": "prepro.jobs.navent.biz",
+  "basePath": "/applicant",
+  "tags": [
+    {
+      "name": "company-job-application-controller",
+      "description": "Company Job Application Controller"
+    },
+    {
+      "name": "company-job-controller",
+      "description": "Company Job Controller"
+    },
+    {
+      "name": "company-curriculum-controller",
+      "description": "Company Curriculum Controller"
+    },
+    {
+      "name": "applicant-job-controller",
+      "description": "Applicant Job Controller"
+    },
+    {
+      "name": "applicant-applicant-controller",
+      "description": "Applicant Applicant Controller"
+    },
+    {
+      "name": "applicant-job-application-controller",
+      "description": "Applicant Job Application Controller"
+    },
+    {
+      "name": "applicant-curriculum-controller",
+      "description": "Applicant Curriculum Controller"
+    },
+    {
+      "name": "commons-controller",
+      "description": "Commons Controller"
+    },
+    {
+      "name": "company-applicant-controller",
+      "description": "Company Applicant Controller"
+    }
+  ],
+  "paths": {
+    "/v1/applicant/applicants/{applicant_id}/applications": {
+      "get": {
+        "tags": [
+          "applicant-applicant-controller"
+        ],
+        "summary": "Get all job applications of an applicant",
+        "operationId": "getJobApplicationsByApplicantUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Apliccant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/applicants/{applicant_id}/applications/{job_id}": {
+      "get": {
+        "tags": [
+          "applicant-applicant-controller"
+        ],
+        "summary": "Get the application of an applicant to a job",
+        "operationId": "getJobApplicationByApplicantAndJobUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Apliccant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Job Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/applicants/{applicant_id}/attached_cv": {
+      "get": {
+        "tags": [
+          "applicant-applicant-controller"
+        ],
+        "summary": "Get attached cv path of an applicant",
+        "operationId": "getAttachedCVPathByApplicantUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Applicant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "applicant-applicant-controller"
+        ],
+        "summary": "Saves an attached cv path of an applicant",
+        "operationId": "saveAttachedCVUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Applicant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "Save attached cv request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SaveAttachedCVRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "applicant-applicant-controller"
+        ],
+        "summary": "Deletes an attached cv path of an applicant",
+        "operationId": "deleteAttachedCVByApplicantUsingDELETE",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Applicant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "204": {
+            "description": "Delete successfully"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/applicants/{applicant_id}/waiting_applications/": {
+      "get": {
+        "tags": [
+          "applicant-applicant-controller"
+        ],
+        "summary": "Get all waiting job applications of an applicant",
+        "operationId": "getWaitingJobApplicationsByApplicantUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Apliccant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/curriculum/{curriculum_id}/applications": {
+      "get": {
+        "tags": [
+          "applicant-curriculum-controller"
+        ],
+        "summary": "Get all job applications with the same curriculum",
+        "operationId": "getJobApplicationsByApplicantUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/curriculum/{curriculum_id}/applications/{job_id}": {
+      "get": {
+        "tags": [
+          "applicant-curriculum-controller"
+        ],
+        "summary": "Get the application with a certain curriculum and job",
+        "operationId": "getJobApplicationByCurriculumAndJobUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Job Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/curriculum/{curriculum_id}/waiting_applications": {
+      "get": {
+        "tags": [
+          "applicant-curriculum-controller"
+        ],
+        "summary": "Get all waiting job applications with the same curriculum",
+        "operationId": "getWaitingJobApplicationsByCurriculumUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "applicant-curriculum-controller"
+        ],
+        "summary": "Applies all waiting job applications with the same curriculum",
+        "operationId": "applyWaitingJobApplicationsByCurriculumUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/job/{job_id}": {
+      "get": {
+        "tags": [
+          "applicant-job-controller"
+        ],
+        "summary": "Get job applications quantity of a certain type for a certain job",
+        "operationId": "getHighlightedApplicationsQuantityByJobAndTypeUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "ApplicationType",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Job id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/job_applications": {
+      "get": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Get job applications of the same job",
+        "operationId": "getJobApplicationsByJobUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "job_id",
+            "in": "query",
+            "description": "Job id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "applicants_id",
+            "in": "query",
+            "description": "Applicants id",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Save a job application",
+        "operationId": "saveJobApplicationUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewJobApplicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Update a job application",
+        "operationId": "updateJobApplicationUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateJobApplicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Delete application",
+        "operationId": "deleteJobApplicationUsingDELETE",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "jobApplicationId",
+            "in": "query",
+            "description": "Job Application Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "204": {
+            "description": "Delete successfully"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Patch a job application",
+        "operationId": "patchJobApplicationUsingPATCH",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "jobApplicationId",
+            "in": "query",
+            "description": "Job Application Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PatchJobApplicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          }
+        }
+      }
+    },
+    "/v1/applicant/job_applications/waiting": {
+      "get": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Get application waiting",
+        "operationId": "getWaitingJobApplicationUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "jobApplicationId",
+            "in": "query",
+            "description": "Job Application Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/applicant/job_applications/{job_application_id}": {
+      "get": {
+        "tags": [
+          "applicant-job-application-controller"
+        ],
+        "summary": "Get job application by application id",
+        "operationId": "getJobApplicationUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "job_application_id",
+            "in": "path",
+            "description": "Job application id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/commons/job_application/attributes": {
+      "get": {
+        "tags": [
+          "commons-controller"
+        ],
+        "summary": "Get all job applications patching attributes",
+        "operationId": "getJobApplicationsAttributesUsingGET",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "bumerank",
+                  "markId",
+                  "companyStatus",
+                  "applicantStatus",
+                  "applicationType",
+                  "highlightPosition",
+                  "highlightDate",
+                  "applicantCreditId"
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/applicants/{applicant_id}/applications": {
+      "get": {
+        "tags": [
+          "company-applicant-controller"
+        ],
+        "summary": "Get all job applications of an applicant",
+        "operationId": "getJobApplicationsByApplicantUsingGET_2",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Apliccant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/applicants/{applicant_id}/applications/{job_id}": {
+      "get": {
+        "tags": [
+          "company-applicant-controller"
+        ],
+        "summary": "Get the application of an applicant to a job",
+        "operationId": "getJobApplicationByApplicantAndJobUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Apliccant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Job Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/applicants/{applicant_id}/waiting_applications/": {
+      "get": {
+        "tags": [
+          "company-applicant-controller"
+        ],
+        "summary": "Get all waiting job applications of an applicant",
+        "operationId": "getWaitingJobApplicationsByApplicantUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "applicant_id",
+            "in": "path",
+            "description": "Apliccant Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/curriculum/{curriculum_id}/applications": {
+      "get": {
+        "tags": [
+          "company-curriculum-controller"
+        ],
+        "summary": "Get all job applications with the same curriculum",
+        "operationId": "getJobApplicationsByApplicantUsingGET_3",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/curriculum/{curriculum_id}/applications/{job_id}": {
+      "get": {
+        "tags": [
+          "company-curriculum-controller"
+        ],
+        "summary": "Get the application with a certain curriculum and job",
+        "operationId": "getJobApplicationByCurriculumAndJobUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Job Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/curriculum/{curriculum_id}/waiting_applications": {
+      "get": {
+        "tags": [
+          "company-curriculum-controller"
+        ],
+        "summary": "Get all waiting job applications with the same curriculum",
+        "operationId": "getWaitingJobApplicationsByCurriculumUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "company-curriculum-controller"
+        ],
+        "summary": "Applies all waiting job applications with the same curriculum",
+        "operationId": "applyWaitingJobApplicationsByCurriculumUsingPUT_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "curriculum_id",
+            "in": "path",
+            "description": "Curriculum Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/job/{job_id}": {
+      "get": {
+        "tags": [
+          "company-job-controller"
+        ],
+        "summary": "Get job applications quantity of a certain type for a certain job",
+        "operationId": "getHighlightedApplicationsQuantityByJobAndTypeUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "ApplicationType",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Job id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/job_applications": {
+      "get": {
+        "tags": [
+          "company-job-application-controller"
+        ],
+        "summary": "Get job applications of the same job",
+        "operationId": "getJobApplicationsByJobUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "job_id",
+            "in": "query",
+            "description": "Job id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "applicants_id",
+            "in": "query",
+            "description": "Applicants id",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JobApplication"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "company-job-application-controller"
+        ],
+        "summary": "Save a job application",
+        "operationId": "saveJobApplicationUsingPOST_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewJobApplicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "company-job-application-controller"
+        ],
+        "summary": "Update a job application",
+        "operationId": "updateJobApplicationUsingPUT_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateJobApplicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "company-job-application-controller"
+        ],
+        "summary": "Patch a job application",
+        "operationId": "patchJobApplicationUsingPATCH_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "jobApplicationId",
+            "in": "query",
+            "description": "Job Application Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PatchJobApplicationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          }
+        }
+      }
+    },
+    "/v1/company/job_applications/waiting": {
+      "get": {
+        "tags": [
+          "company-job-application-controller"
+        ],
+        "summary": "Get application waiting",
+        "operationId": "getWaitingJobApplicationUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "jobApplicationId",
+            "in": "query",
+            "description": "Job Application Id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/company/job_applications/{job_application_id}": {
+      "get": {
+        "tags": [
+          "company-job-application-controller"
+        ],
+        "summary": "Get job application by application id",
+        "operationId": "getJobApplicationUsingGET_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portal",
+            "in": "query",
+            "description": "Portal",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "bumeran",
+              "zonajobs"
+            ]
+          },
+          {
+            "name": "job_application_id",
+            "in": "path",
+            "description": "Job application id",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JobApplication"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Failure"
+          },
+          "402": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "UpdateJobApplicationRequest": {
+      "type": "object",
+      "properties": {
+        "applicantCreditId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Applicant credit id"
+        },
+        "applicantId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Applicant id"
+        },
+        "applicantStatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Status of the job application for the applicant"
+        },
+        "applicationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of application"
+        },
+        "applicationType": {
+          "type": "string",
+          "description": "Type of the application"
+        },
+        "bumerank": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Bumerank value"
+        },
+        "companyStatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Status of the job application for the company"
+        },
+        "curriculumId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Curriculum id"
+        },
+        "highlightDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of the highlight"
+        },
+        "highlightPosition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Position between the highlighted applications"
+        },
+        "jobApplicationId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Job application id"
+        },
+        "jobId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Job id"
+        },
+        "markId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Mark id of the application"
+        },
+        "originId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The origin id"
+        },
+        "salary": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Salary expected for job"
+        },
+        "waiting": {
+          "type": "boolean",
+          "example": false,
+          "description": "Is waiting to truly apply"
+        }
+      },
+      "description": "Updates an old job application"
+    },
+    "JobApplication": {
+      "type": "object",
+      "properties": {
+        "applicantCreditId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "applicantId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "applicantStatus": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "applicationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "applicationType": {
+          "type": "string"
+        },
+        "bumerank": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "companyStatus": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "curriculumId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "highlightDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "highlightPosition": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "jobApplicationId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "jobId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "markId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "originId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "portal": {
+          "type": "string"
+        },
+        "salary": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "waiting": {
+          "type": "boolean"
+        }
+      }
+    },
+    "NewJobApplicationRequest": {
+      "type": "object",
+      "properties": {
+        "applicantCreditId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Applicant credit id"
+        },
+        "applicantId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Applicant id"
+        },
+        "applicantStatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Status of the job application for the applicant"
+        },
+        "applicationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of application"
+        },
+        "applicationType": {
+          "type": "string",
+          "description": "Type of the application"
+        },
+        "bumerank": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Bumerank value"
+        },
+        "companyStatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Status of the job application for the company"
+        },
+        "curriculumId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Curriculum id"
+        },
+        "highlightDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date of the highlight"
+        },
+        "highlightPosition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Position between the highlighted applications"
+        },
+        "jobApplicationId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Job application id"
+        },
+        "jobId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Job id"
+        },
+        "markId": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Mark id of the application"
+        },
+        "originId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The origin id"
+        },
+        "salary": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Salary expected for job"
+        },
+        "waiting": {
+          "type": "boolean",
+          "example": false,
+          "description": "Is waiting to truly apply"
+        }
+      },
+      "description": "Save a new job application"
+    },
+    "PatchJobApplicationRequest": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "type": "object",
+          "description": "Patch attributes and values",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Patches an old job application"
+    },
+    "SaveAttachedCVRequest": {
+      "type": "object",
+      "properties": {
+        "attachedCvPath": {
+          "type": "string",
+          "description": "Attached CV path"
+        }
+      }
+    }
+  }
+}
