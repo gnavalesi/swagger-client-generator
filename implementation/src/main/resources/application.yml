@@ -1,0 +1,4 @@
+---
+
+applicant-service:
+  base-url: http://jobs.navent.biz/applicant/

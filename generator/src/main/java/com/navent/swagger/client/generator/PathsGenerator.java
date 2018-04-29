@@ -2,6 +2,7 @@ package com.navent.swagger.client.generator;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Streams;
+import com.navent.swagger.client.implementation.Controller;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -10,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,20 +107,7 @@ public class PathsGenerator {
                 .collect(Collectors.toList());
     }
 
-    Iterable<TypeSpec> generatePaths(JSONObject paths) {
-//        Map<String, List<String>> pathsListMap = paths.keySet().stream()
-//                .collect(Collectors.toMap(Function.identity(), PathsGenerator::splitPath));
-//
-//        Map<String, Map<String, List<String>>> res = pathsListMap.entrySet().stream()
-//                .reduce(new HashMap<>(),
-//                        (Map<String, Map<String, List<String>>> acc, Map.Entry<String, List<String>> e) -> {
-//                            Map<String, List<String>> item = acc.computeIfAbsent(e.getValue().get(0), k -> new HashMap<>());
-//                            item.put(e.getKey(), e.getValue().subList(1, e.getValue().size()));
-//
-//                            return acc;
-//                        }, (a, b) -> a);
-
-        // paths.keySet().stre
+    private Iterable<TypeSpec> generatePaths(JSONObject paths) {
         return paths.keySet().stream()
                 .map(path -> Pair.of(path, paths.getJSONObject(path)))
                 .flatMap(pair -> pair.getRight().keySet().stream()
@@ -133,7 +120,7 @@ public class PathsGenerator {
 
     private TypeSpec createController(Map.Entry<String, List<Pair<Pair<String, String>, JSONObject>>> definition) {
         return TypeSpec.classBuilder(definition.getKey() + "Controller")
-                .addAnnotation(Component.class)
+                .superclass(Controller.class)
                 .addMethods(definition.getValue().stream()
                         .flatMap(this::createMethods)
                         .collect(Collectors.toList()))
@@ -149,21 +136,21 @@ public class PathsGenerator {
 
         String methodName = definition.getString("operationId").replace("Using" + httpMethod.toUpperCase(), "");
 
-        methods.add(MethodSpec.methodBuilder(methodName)
-                .returns(
-                        definition.getJSONObject("responses").keySet().stream()
-                                .map(k -> definition.getJSONObject("responses").getJSONObject(k))
-                                .filter(d -> d.has("schema"))
-                                .map(d -> d.getJSONObject("schema"))
-                                .map(d -> {
-                                    if (d.has("$ref")) {
-                                        return ClassName.get(basePackage + ".model", d.getString("$ref").replace("#/definitions/", ""));
-                                    } else {
-                                        return ClassName.get(Void.class);
-                                    }
-                                })
-                                .findFirst().orElse(ClassName.get(Void.class)))
-                .build());
+        MethodSpec.Builder syncBuilder = MethodSpec.methodBuilder(methodName);
+        definition.getJSONObject("responses").keySet().stream()
+                .map(k -> definition.getJSONObject("responses").getJSONObject(k))
+                .filter(d -> d.has("schema"))
+                .map(d -> d.getJSONObject("schema"))
+                .map(d -> {
+                    if (d.has("$ref")) {
+                        return ClassName.get(basePackage + ".client.model", d.getString("$ref").replace("#/definitions/", ""));
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull).findFirst().ifPresent(syncBuilder::returns);
+
+        methods.add(syncBuilder.build());
 
         return methods.stream();
     }

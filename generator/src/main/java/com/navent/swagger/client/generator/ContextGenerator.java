@@ -15,6 +15,7 @@ import javax.lang.model.element.Modifier;
 import java.io.File;
 
 class ContextGenerator {
+
     public static void generate(String basePackage, String serviceName, String outputPath, JSONObject definition) throws Exception {
         generateRestConfig(basePackage, serviceName, outputPath, definition);
         generateConfig(basePackage, serviceName, outputPath);
@@ -22,11 +23,11 @@ class ContextGenerator {
 
     private static void generateRestConfig(String basePackage, String serviceName, String outputPath, JSONObject definition) throws Exception {
         JavaFile.builder(basePackage + ".client.config",
-                TypeSpec.classBuilder(serviceName + "ClientRestConfig")
+                TypeSpec.classBuilder(CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, serviceName) + "ClientRestConfig")
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Data.class)
                         .addAnnotation(AnnotationSpec.builder(PropertySource.class)
-                                .addMember("prefix", "$S", CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, serviceName))
+                                .addMember("prefix", "$S", serviceName)
                                 .build())
                         .addField(FieldSpec.builder(String.class, "host", Modifier.PRIVATE)
                                 .initializer("$S", definition.get("host"))
@@ -41,7 +42,7 @@ class ContextGenerator {
 
     private static void generateConfig(String basePackage, String serviceName, String outputPath) throws Exception {
         JavaFile.builder(basePackage + ".client.config",
-                TypeSpec.classBuilder(serviceName + "ClientConfig")
+                TypeSpec.classBuilder(CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, serviceName) + "ClientConfig")
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Configuration.class)
                         .addAnnotation(AnnotationSpec.builder(ComponentScan.class)

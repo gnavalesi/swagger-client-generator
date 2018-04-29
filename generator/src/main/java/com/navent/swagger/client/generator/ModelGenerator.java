@@ -116,7 +116,7 @@ public class ModelGenerator {
                 if ("date-time".equals(format)) {
                     return FieldSpec.builder(Date.class, name, Modifier.PRIVATE)
                             .addAnnotation(AnnotationSpec.builder(JsonFormat.class)
-                                    .addMember("shape", "$L", JsonFormat.Shape.STRING)
+                                    .addMember("shape", CodeBlock.builder().add("JsonFormat.Shape.STRING").build())
                                     .addMember("pattern", "$S", "dd-MM-yyyy hh:mm:ss")
                                     .build());
                 } else {

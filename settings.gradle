@@ -1,0 +1,6 @@
+rootProject.name = 'swagger-client-generator'
+
+include 'generator'
+include 'implementation'
+include 'applicant-service-client'
+
