@@ -7,7 +7,7 @@ import com.navent.swagger.client.generator.Generator.Config
 import com.squareup.javapoet._
 import io.swagger.models.{Model, Swagger}
 import lombok.{Builder, Data}
-import org.apache.commons.lang3.StringUtils._
+import org.apache.commons.lang3.StringUtils
 
 import scala.collection.JavaConverters._
 
@@ -15,12 +15,7 @@ object ModelGenerator {
 
   def generate(swagger: Swagger)(implicit config: Config): Unit = {
     swagger.getDefinitions.asScala
-      .map({
-        case (name: String, model: Model) =>
-          val generatedModel = generateModel(name, model)
-          config.generatedModels(name) = generatedModel
-          generatedModel
-      })
+      .map(p => generateModel(p._1, p._2))
       .foreach(t => writeToFile(t))
   }
 
@@ -29,7 +24,19 @@ object ModelGenerator {
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(classOf[Data])
       .addAnnotation(classOf[Builder])
-      .addJavadoc(if (isNotBlank(model.getDescription)) model.getDescription else "")
+
+    val javadocBuilder = CodeBlock.builder()
+
+    if(StringUtils.isNotBlank(model.getTitle))
+      javadocBuilder.add("Title: $L\n", model.getTitle)
+
+    if(StringUtils.isNotBlank(model.getDescription))
+      javadocBuilder.add("$L\n", model.getDescription)
+
+    if(model.getExample != null)
+      javadocBuilder.add("Example: $L\n", model.getExample)
+
+    builder.addJavadoc(javadocBuilder.build())
 
     PropertyGenerator.generate(model.getProperties.asScala).foreach(p => {
       builder.addField(p.field)
