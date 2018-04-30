@@ -22,5 +22,9 @@ dependencies {
     compile group: 'org.zalando', name: 'riptide-capture', version: riptideVersion
     compile group: 'org.zalando', name: 'riptide-timeout', version: riptideVersion
 
+    // Javax Validation
+    compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
+
+    // Test
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

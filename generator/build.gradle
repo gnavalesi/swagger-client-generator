@@ -2,6 +2,7 @@ group 'com.navent.swagger-client'
 version '0.0.1-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'scala'
 
 sourceCompatibility = 1.8
 
@@ -21,8 +22,14 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.5'
     compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
+    // Scala
+    compile 'org.scala-lang:scala-library:2.12.6'
+
+    // Scopt
+    compile 'com.github.scopt:scopt_2.12:3.7.0'
+
     // Swagger
-    compile 'io.swagger:swagger-parser:1.0.36-SNAPSHOT'
+    compile 'io.swagger:swagger-parser:1.0.35'
 
     // Jinjava
     compile 'com.hubspot.jinjava:jinjava:2.0.11-java7'
