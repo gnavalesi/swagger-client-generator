@@ -1,6 +1,7 @@
 package com.navent.swagger.client.generator
 
 import java.io.{File, IOException}
+import javax.lang.model.element.Modifier
 
 import com.google.common.base.CaseFormat
 import com.navent.swagger.client.generator.Generator.Config
@@ -12,6 +13,8 @@ import scala.collection.JavaConverters._
 
 object PathGenerator {
 
+  case class InternalOperation(url: String, method: HttpMethod, operation: Operation)
+
   def generate(swagger: Swagger)(implicit config: Config): Unit = {
     swagger.getPaths.asScala
       .flatMap({
@@ -19,11 +22,11 @@ object PathGenerator {
           mapToOperations(url, path)
       })
       .groupBy({
-        case (url: String, method: HttpMethod, operation: Operation) =>
+        case InternalOperation(url: String, method: HttpMethod, operation: Operation) =>
           getControllerName(url, method, operation)
       })
       .map({
-        case (controllerName: String, operations: Iterable[(String, HttpMethod, Operation)]) =>
+        case (controllerName: String, operations: Iterable[InternalOperation]) =>
           val generatedController = createController(controllerName, operations)
           config.generatedControllers(controllerName) = generatedController
           generatedController
@@ -31,9 +34,9 @@ object PathGenerator {
       .foreach(typeSpec => writeToFile(typeSpec))
   }
 
-  private def mapToOperations(url: String, path: Path): Iterable[(String, HttpMethod, Operation)] =
+  private def mapToOperations(url: String, path: Path): Iterable[InternalOperation] =
     path.getOperationMap.asScala.map({
-      case (method: HttpMethod, operation: Operation) => (url, method, operation)
+      case (method: HttpMethod, operation: Operation) => InternalOperation(url, method, operation)
     })
 
   private def getControllerName(url: String, method: HttpMethod, operation: Operation) =
@@ -41,19 +44,21 @@ object PathGenerator {
       .find(_.endsWith("-controller"))
       .getOrElse("default-controller")
 
-
-  private def createController(controllerName: String, operations: Iterable[(String, HttpMethod, Operation)])(implicit config: Config) =
+  private def createController(controllerName: String, operations: Iterable[InternalOperation])(implicit config: Config): TypeSpec =
     TypeSpec
       .classBuilder(CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, controllerName))
       .superclass(classOf[Controller])
-      .addMethods(operations.map({
-        case (url: String, method: HttpMethod, operation: Operation) => MethodGenerator.generate(url, method, operation)
+      .addModifiers(Modifier.PUBLIC)
+      .addMethods(operations.flatMap({
+        e: InternalOperation => MethodGenerator.generate(e)
       }).asJava)
       .build
 
   private def writeToFile(t: TypeSpec)(implicit config: Config): Unit = {
     try
-      JavaFile.builder(config.controllerPackage, t).build.writeTo(new File(config.codeOutput))
+      JavaFile.builder(config.controllerPackage, t)
+        .indent("\t")
+        .build.writeTo(new File(config.codeOutput))
     catch {
       case e: IOException =>
         e.printStackTrace()

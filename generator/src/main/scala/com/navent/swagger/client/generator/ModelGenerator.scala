@@ -5,7 +5,7 @@ import javax.lang.model.element.Modifier
 
 import com.navent.swagger.client.generator.Generator.Config
 import com.squareup.javapoet._
-import io.swagger.models.{Model, Swagger}
+import io.swagger.models._
 import lombok.{Builder, Data}
 import org.apache.commons.lang3.StringUtils
 
@@ -15,11 +15,11 @@ object ModelGenerator {
 
   def generate(swagger: Swagger)(implicit config: Config): Unit = {
     swagger.getDefinitions.asScala
-      .map(p => generateModel(p._1, p._2))
+      .map(p => generate(p._1, p._2))
       .foreach(t => writeToFile(t))
   }
 
-  private def generateModel(name: String, model: Model)(implicit config: Config): TypeSpec = {
+  def generate(name: String, model: Model)(implicit config: Config): TypeSpec = {
     val builder: TypeSpec.Builder = TypeSpec.classBuilder(name)
       .addModifiers(Modifier.PUBLIC)
       .addAnnotation(classOf[Data])

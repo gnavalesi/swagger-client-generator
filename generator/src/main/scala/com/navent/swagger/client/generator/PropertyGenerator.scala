@@ -118,7 +118,7 @@ object PropertyGenerator {
   }
 
   private def integerBuilder(name: String, property: IntegerProperty)(implicit config: Config): FieldInternalResult = {
-    val builder = FieldSpec.builder(TypeName.INT, name, Modifier.PRIVATE)
+    val builder = FieldSpec.builder(ClassName.get(classOf[java.lang.Integer]), name, Modifier.PRIVATE)
     if (property.getDefault != null) builder.initializer("$L", property.getDefault)
     if (CollectionUtils.isNotEmpty(property.getEnum)) {
       builder.addAnnotation(AnnotationSpec.builder(classOf[AllowableValues])
@@ -126,11 +126,11 @@ object PropertyGenerator {
         .build)
     }
 
-    FieldInternalResult(TypeName.INT, builder, Seq())
+    FieldInternalResult(ClassName.get(classOf[java.lang.Integer]), builder, Seq())
   }
 
   private def longBuilder(name: String, property: LongProperty)(implicit config: Config): FieldInternalResult = {
-    val builder = FieldSpec.builder(TypeName.LONG, name, Modifier.PRIVATE)
+    val builder = FieldSpec.builder(ClassName.get(classOf[java.lang.Long]), name, Modifier.PRIVATE)
     if (property.getDefault != null) builder.initializer("$L", property.getDefault)
     if (CollectionUtils.isNotEmpty(property.getEnum)) {
       builder.addAnnotation(AnnotationSpec.builder(classOf[AllowableValues])
@@ -138,7 +138,7 @@ object PropertyGenerator {
         .build)
     }
 
-    FieldInternalResult(TypeName.LONG, builder, Seq())
+    FieldInternalResult(ClassName.get(classOf[java.lang.Long]), builder, Seq())
   }
 
   private def decimalBuilder(name: String, property: DecimalProperty)(implicit config: Config): FieldInternalResult = {
@@ -153,7 +153,7 @@ object PropertyGenerator {
   }
 
   private def doubleBuilder(name: String, property: DoubleProperty)(implicit config: Config): FieldInternalResult = {
-    val builder = FieldSpec.builder(TypeName.DOUBLE, name, Modifier.PRIVATE)
+    val builder = FieldSpec.builder(ClassName.get(classOf[java.lang.Double]), name, Modifier.PRIVATE)
     if (property.getDefault != null) builder.initializer("$L", property.getDefault)
     if (CollectionUtils.isNotEmpty(property.getEnum)) {
       builder.addAnnotation(AnnotationSpec.builder(classOf[AllowableValues])
@@ -161,11 +161,11 @@ object PropertyGenerator {
         .build)
     }
 
-    FieldInternalResult(TypeName.DOUBLE, builder, Seq())
+    FieldInternalResult(ClassName.get(classOf[java.lang.Double]), builder, Seq())
   }
 
   private def floatBuilder(name: String, property: FloatProperty)(implicit config: Config): FieldInternalResult = {
-    val builder = FieldSpec.builder(TypeName.FLOAT, name, Modifier.PRIVATE)
+    val builder = FieldSpec.builder(ClassName.get(classOf[java.lang.Float]), name, Modifier.PRIVATE)
     if (property.getDefault != null) builder.initializer("$L", property.getDefault)
     if (CollectionUtils.isNotEmpty(property.getEnum)) {
       builder.addAnnotation(AnnotationSpec.builder(classOf[AllowableValues])
@@ -173,7 +173,7 @@ object PropertyGenerator {
         .build)
     }
 
-    FieldInternalResult(TypeName.FLOAT, builder, Seq())
+    FieldInternalResult(ClassName.get(classOf[java.lang.Float]), builder, Seq())
   }
 
   private def arrayBuilder(name: String, property: ArrayProperty)(implicit config: Config): FieldInternalResult = {
@@ -200,7 +200,7 @@ object PropertyGenerator {
   }
 
   private def booleanBuilder(name: String, property: BooleanProperty)(implicit config: Config): FieldInternalResult = {
-    val builder = FieldSpec.builder(TypeName.BOOLEAN, name, Modifier.PRIVATE)
+    val builder = FieldSpec.builder(ClassName.get(classOf[java.lang.Boolean]), name, Modifier.PRIVATE)
     if (property.getDefault != null) builder.initializer("$L", property.getDefault)
     if (CollectionUtils.isNotEmpty(property.getEnum)) {
       builder.addAnnotation(AnnotationSpec.builder(classOf[AllowableValues])
@@ -208,7 +208,7 @@ object PropertyGenerator {
         .build)
     }
 
-    FieldInternalResult(TypeName.BOOLEAN, builder, Seq())
+    FieldInternalResult(ClassName.get(classOf[java.lang.Boolean]), builder, Seq())
   }
 
   private def stringBuilder(name: String, property: StringProperty)(implicit config: Config): FieldInternalResult = {
@@ -369,7 +369,11 @@ object PropertyGenerator {
     FieldInternalResult(ClassName.get(classOf[String]), builder, Seq())
   }
 
-  private def refBuilder(name: String, property: RefProperty)(implicit config: Config): FieldInternalResult = ???
+  private def refBuilder(name: String, property: RefProperty)(implicit config: Config): FieldInternalResult = {
+    val fieldBuilder = FieldSpec.builder(ClassName.get(config.modelPackage, property.getSimpleRef), name, Modifier.PRIVATE)
+
+    FieldInternalResult(ClassName.get(config.modelPackage, property.getSimpleRef), fieldBuilder, Seq())
+  }
 
   private def untypedBuilder(name: String, property: UntypedProperty)(implicit config: Config): FieldInternalResult = {
     val builder = FieldSpec.builder(classOf[String], name, Modifier.PRIVATE)
