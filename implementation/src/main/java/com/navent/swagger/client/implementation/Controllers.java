@@ -1,11 +1,14 @@
 package com.navent.swagger.client.implementation;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.navent.swagger.client.implementation.exceptions.InformationalStatusException;
 import com.navent.swagger.client.implementation.exceptions.RedirectionStatusException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.zalando.riptide.*;
+import org.zalando.riptide.spring.ClientHttpMessageConverters;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -72,13 +75,5 @@ public class Controllers {
 				clientErrorBinding(result),
 				serverErrorBinding(result));
 		return result;
-	}
-
-	public static <T> String toQueryParameter(T object, Class<? extends T> theClass) {
-		return object.toString();
-	}
-
-	public static <T> String toHeaderParameter(T object, Class<? extends T> theClass) {
-		return object.toString();
 	}
 }
