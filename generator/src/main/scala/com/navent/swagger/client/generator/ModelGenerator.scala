@@ -13,10 +13,9 @@ import scala.collection.JavaConverters._
 
 object ModelGenerator {
 
-  def generate(swagger: Swagger)(implicit config: Config): Unit = {
+  def generate(swagger: Swagger)(implicit config: Config): Iterable[TypeSpec] = {
     swagger.getDefinitions.asScala
       .map(p => generate(p._1, p._2))
-      .foreach(t => writeToFile(t))
   }
 
   def generate(name: String, model: Model)(implicit config: Config): TypeSpec = {

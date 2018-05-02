@@ -11,9 +11,6 @@ repositories {
 
 dependencies {
 
-    // Spring
-    compile group: 'org.springframework', name: 'spring-context', version: springFrameworkVersion
-
     // Lombok
     compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 

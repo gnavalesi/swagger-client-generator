@@ -3,36 +3,67 @@ package com.navent.swagger.client.generator
 import java.io.File
 import javax.lang.model.element.Modifier
 
-import com.google.common.base.CaseFormat
+import com.google.common.base.CaseFormat._
 import com.navent.swagger.client.generator.Generator.Config
-import com.squareup.javapoet.{AnnotationSpec, FieldSpec, JavaFile, TypeSpec}
+import com.navent.swagger.client.implementation.config.{RestClientConfig, RestClientConfiguration}
+import com.squareup.javapoet._
 import io.swagger.models.Swagger
-import lombok.Data
-import org.springframework.context.annotation.{ComponentScan, Configuration, PropertySource}
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Bean
+
+import scala.collection.JavaConverters._
 
 object ContextGenerator {
 
   def generate(swagger: Swagger)(implicit config: Config): Unit = {
-    generateRestConfig(swagger)
-    generateConfig(swagger)
+
+    //    generateConfig(swagger)
+    generateRestClientConfig(swagger)
+    generateRestClientConfiguration(swagger)
   }
 
-  private def generateRestConfig(swagger: Swagger)(implicit config: Config): Unit = {
+  private def generateRestClientConfig(swagger: Swagger)(implicit config: Config): Unit = {
     JavaFile.builder(config.configPackage, TypeSpec
-      .classBuilder(CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, config.serviceName) + "ClientRestConfig")
-      .addModifiers(Modifier.PUBLIC).addAnnotation(classOf[Data])
-      .addAnnotation(AnnotationSpec.builder(classOf[PropertySource]).addMember("prefix", "$S", config.serviceName)
+      .classBuilder(getClassName("ClientConfig"))
+      .addModifiers(Modifier.PUBLIC)
+      .addAnnotation(AnnotationSpec.builder(classOf[ConfigurationProperties])
+        .addMember("prefix", "$S", config.serviceName)
         .build)
-      .addField(FieldSpec.builder(classOf[String], "host", Modifier.PRIVATE).initializer("$S", swagger.getHost).build)
-      .addField(FieldSpec.builder(classOf[String], "basePath", Modifier.PRIVATE).initializer("$S", swagger.getBasePath)
-        .build).build).build.writeTo(new File(config.codeOutput))
+      .superclass(classOf[RestClientConfig]).build)
+      .build.writeTo(new File(config.codeOutput))
   }
 
-  private def generateConfig(swagger: Swagger)(implicit config: Config): Unit = {
+  private def generateRestClientConfiguration(swagger: Swagger)(implicit config: Config): Unit = {
     JavaFile.builder(config.configPackage, TypeSpec
-      .classBuilder(CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, config.serviceName) + "ClientConfig")
-      .addModifiers(Modifier.PUBLIC).addAnnotation(classOf[Configuration])
-      .addAnnotation(AnnotationSpec.builder(classOf[ComponentScan]).addMember("value", "$S", config.basePackage).build).build)
+      .classBuilder(getClassName("ClientConfiguration"))
+      .addModifiers(Modifier.PUBLIC)
+      .superclass(classOf[RestClientConfiguration])
+      .addMethod(MethodSpec.constructorBuilder() // Constructor
+        .addModifiers(Modifier.PUBLIC)
+        .addParameter(ClassName.get(config.configPackage, getClassName("ClientConfig")), "config")
+        .addStatement("super(config)")
+        .build)
+      .addMethod(MethodSpec // ClientConfig Bean
+        .methodBuilder(UPPER_CAMEL.to(LOWER_CAMEL, getClassName("ClientConfig")))
+        .returns(ClassName.get(config.configPackage, getClassName("ClientConfig")))
+        .addModifiers(Modifier.PROTECTED)
+        .addAnnotation(classOf[Bean])
+        .addStatement("return new $T()", ClassName.get(config.configPackage, getClassName("ClientConfig")))
+        .build)
+      .addMethods(config.generatedControllers.map(c => c._2.name).map(c => { // Controllers Beans
+        MethodSpec
+          .methodBuilder(UPPER_CAMEL.to(LOWER_CAMEL, c))
+          .returns(ClassName.get(config.controllerPackage, c))
+          .addModifiers(Modifier.PROTECTED)
+          .addAnnotation(classOf[Bean])
+          .addStatement("return new $T(this)", ClassName.get(config.controllerPackage, c))
+          .build
+      }).asJava)
+      .build)
       .build.writeTo(new File(config.codeOutput))
+  }
+
+  private def getClassName(suffix: String)(implicit config: Config): String = {
+    LOWER_HYPHEN.to(UPPER_CAMEL, config.serviceName) + suffix
   }
 }

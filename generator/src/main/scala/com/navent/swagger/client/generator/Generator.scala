@@ -1,8 +1,9 @@
 package com.navent.swagger.client.generator
 
-import java.io.File
+import java.io.{File, IOException, PrintWriter}
 
-import com.squareup.javapoet.TypeSpec
+import com.navent.swagger.client.implementation.Controllers
+import com.squareup.javapoet.{JavaFile, TypeSpec}
 import io.swagger.parser.SwaggerParser
 
 import scala.collection.mutable
@@ -20,9 +21,20 @@ object Generator {
   private def generate(implicit config: Config): Unit = {
     val swagger = new SwaggerParser().read(config.specification.getPath)
 
+    val models = ModelGenerator.generate(swagger)
+    models.foreach(t => {
+      config.generatedModels += (t.name -> t)
+      writeToFile(JavaFile.builder(config.modelPackage, t))
+    })
+
+    val paths = PathGenerator.generate(swagger)
+    paths.foreach(p => {
+      config.generatedControllers += (p.name -> p)
+      writeToFile(JavaFile.builder(config.controllerPackage, p)
+        .addStaticImport(classOf[Controllers], "*"))
+    })
+
     ContextGenerator.generate(swagger)
-    ModelGenerator.generate(swagger)
-    PathGenerator.generate(swagger)
     GradleGenerator.generate
   }
 
@@ -55,7 +67,8 @@ object Generator {
     head("generator")
 
     opt[String]('b', "basePackage").required().valueName("<basePackage>")
-      .action((x, c) => c.copy(basePackage = x, modelPackage = s"$x.model", controllerPackage = s"$x.controller", configPackage = s"$x.config"))
+      .action((x, c) => c
+        .copy(basePackage = x, modelPackage = s"$x.model", controllerPackage = s"$x.controller", configPackage = s"$x.config"))
       .text("basePackage is a required string property")
 
     opt[String]('n', "serviceName").required().valueName("<serviceName>")
@@ -80,5 +93,21 @@ object Generator {
         c.copy(output = corrected, codeOutput = s"${corrected}src/main/java")
       })
       .text("output is a required string property")
+  }
+
+  private def writeToFile(builder: JavaFile.Builder)(implicit config: Config): Unit = {
+    try
+      builder.indent("\t")
+        .build.writeTo(new File(config.codeOutput))
+    catch {
+      case e: IOException =>
+        e.printStackTrace()
+    }
+  }
+
+  private def writeToFile(path: String, content: String)(implicit config: Config): Unit = {
+    val pw = new PrintWriter(new File(config.output + path))
+    pw.write(content)
+    pw.close()
   }
 }

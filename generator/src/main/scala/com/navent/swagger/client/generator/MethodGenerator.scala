@@ -75,74 +75,74 @@ object MethodGenerator {
 
     allParametersBuilder
       .addStatement({
-        val codeBlockBuilder = CodeBlock.builder()
-          .add("return dispatch").add(if (isListReturn) "List" else "").add("($T.class, ", concreteReturnType)
-          .add(parameters.filter(p => p.parameter.isInstanceOf[PathParameter]).map(p => p.spec.name)
-            .mkString(", ") match {
-            case "" => "http.$L($S)"
-            case s => "http.$L($S, " + s + ")"
-          }, internal.method.name().toLowerCase, internal.url)
-
-        if (CollectionUtils.isNotEmpty(internal.operation.getConsumes)) {
-          val mediaTypeBlock = CodeBlock.builder()
-            .add("$T.parseMediaType($S)", classOf[MediaType], internal.operation.getConsumes.asScala.head).build
-
-          codeBlockBuilder
-            .add("\n.accept(").add(mediaTypeBlock).add(")")
-            .add("\n.contentType(").add(mediaTypeBlock).add(")")
-        }
-
-//        parameters.filter(p => p.parameter.isInstanceOf[QueryParameter]).foreach(p =>
-//          codeBlockBuilder.add("\n.queryParam($S, $L" + (
-//            if (!p.theType.equals(ClassName.get(classOf[String]))) ".toString()" else "") + ")", p.parameter
-//            .getName, p.spec.name)
-//        )
-
-//        parameters.filter(p => p.parameter.isInstanceOf[HeaderParameter]).foreach(p =>
-//          codeBlockBuilder.add(".header($S, $L" + (
-//            if (!p.theType.equals(ClassName.get(classOf[String]))) ".toString()" else "") + ")", p.parameter
-//            .getName, p.spec.name)
-//        )
-
-        //        parameters.filter(p => p.parameter.isInstanceOf[BodyParameter]).find(_ => true).foreach(p =>
-        //          codeBlockBuilder.add("\n.body($L)", p.spec.name)
-        //        )
-        codeBlockBuilder
-          .add(parameters // Query Parameters
-            .filter(p => p.parameter.isInstanceOf[QueryParameter])
-            .map(p => CodeBlock.builder()
-              .add("\n.queryParam($S, toQueryParameter($L, $L.getClass()))", p.parameter.getName, p.spec.name, p.spec.name)
-              .build())
-            .foldLeft(CodeBlock.builder())((acc, c) => acc.add(c))
-            .build())
-          .add(parameters // Header Parameters
-            .filter(p => p.parameter.isInstanceOf[HeaderParameter])
-            .map(p => CodeBlock.builder()
-              .add("\n.header($S, toHeaderParameter($L, $L.getClass()))", p.parameter.getName, p.spec.name, p.spec.name)
-              .build())
-            .foldLeft(CodeBlock.builder())((acc, c) => acc.add(c))
-            .build())
-          .add(parameters // Body Parameter
-            .filter(p => p.parameter.isInstanceOf[BodyParameter])
-            .find(_ => true)
-            .map(p => CodeBlock.builder().add("\n.body($L)", p.spec.name).build())
-            .getOrElse(emptyCodeBlock))
+        CodeBlock.builder()
+          .add("return dispatch").add(if (isListReturn) "List" else "").add("($T.class, ", concreteReturnType) // Return
+          .add(getQueryCall(internal, parameters))
+          .indent()
+          .add(getContentType(internal))
+          .add(getQueryParameters(parameters))
+          .add(getHeaderParameters(parameters))
+          .add(getBodyParameter(parameters))
           .add(")")
+          .unindent()
           .build()
       })
 
+    allParametersBuilder.returns(concreteFutureType)
 
-    val requiredParametersBuilder = createRequiredParametersBuilder(name, returnType, parameters)
-
-    allParametersBuilder
-      .returns(concreteFutureType)
-
-    requiredParametersBuilder.map(r =>
-      r.returns(concreteFutureType))
-
-    Seq(Option(allParametersBuilder), requiredParametersBuilder)
+    Seq(Option(allParametersBuilder), createRequiredParametersBuilder(name, returnType, parameters)
+      .map(r => r.returns(concreteFutureType)))
       .filter(p => p.isDefined)
       .map(p => p.get.build)
+  }
+
+  private def getQueryCall(internal: InternalOperation, parameters: List[ParameterResult]): CodeBlock = {
+    CodeBlock.builder().add("http().$L($S" + (parameters.filter(p => p.parameter.isInstanceOf[PathParameter])
+      .map(p => p.spec.name)
+      .mkString(", ") match {
+      case "" => ""
+      case s => ", " + s
+    }) + ")", internal.method.name().toLowerCase, internal.url).build()
+  }
+
+  private def getContentType(internal: InternalOperation) = {
+    Option(internal.operation.getConsumes) // Content Type
+      .filter(CollectionUtils.isNotEmpty)
+      .map(cs => CodeBlock.builder().add("$T.parseMediaType($S)", classOf[MediaType], cs.get(0)).build())
+      .map(c => CodeBlock.builder()
+        .add("\n.accept(").add(c).add(")")
+        .add("\n.contentType(").add(c).add(")")
+        .build)
+      .getOrElse(emptyCodeBlock)
+  }
+
+  private def getQueryParameters(parameters: List[ParameterResult]) = {
+    parameters // Query Parameters
+      .filter(p => p.parameter.isInstanceOf[QueryParameter])
+      .map(p => CodeBlock.builder()
+        .add("\n.queryParam($S, toQueryParameter($L, $L.getClass()))", p.parameter.getName, p.spec.name, p.spec
+          .name)
+        .build())
+      .foldLeft(CodeBlock.builder())((acc, c) => acc.add(c))
+      .build()
+  }
+
+  private def getHeaderParameters(parameters: List[ParameterResult]) = {
+    parameters // Header Parameters
+      .filter(p => p.parameter.isInstanceOf[HeaderParameter])
+      .map(p => CodeBlock.builder()
+        .add("\n.header($S, toHeaderParameter($L, $L.getClass()))", p.parameter.getName, p.spec.name, p.spec.name)
+        .build())
+      .foldLeft(CodeBlock.builder())((acc, c) => acc.add(c))
+      .build()
+  }
+
+  private def getBodyParameter(parameters: List[ParameterResult]) = {
+    parameters // Body Parameter
+      .filter(p => p.parameter.isInstanceOf[BodyParameter])
+      .find(_ => true)
+      .map(p => CodeBlock.builder().add("\n.body($L)", p.spec.name).build())
+      .getOrElse(emptyCodeBlock)
   }
 
   private def emptyCodeBlock: CodeBlock = CodeBlock.builder().build()
@@ -187,7 +187,7 @@ object MethodGenerator {
       .map({
         case m: ArrayModel =>
           val itemsType = PropertyGenerator.generate("items", m.getItems).theType
-          ReturnType(itemsType, true)
+          ReturnType(itemsType, isList = true)
         case m: RefModel =>
           ReturnType(ClassName.get(config.modelPackage, m.getSimpleRef))
         case m: ModelImpl => ReturnType(m.getType match {
@@ -202,7 +202,7 @@ object MethodGenerator {
               case "" | null => ClassName.get(classOf[String])
             }
         })
-        case m: ComposedModel => println("NotImplemented ComposedModel")
+        case _: ComposedModel => println("NotImplemented ComposedModel")
           ???
       })
       .find(_ => true)

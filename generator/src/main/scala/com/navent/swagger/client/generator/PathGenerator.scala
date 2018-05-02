@@ -4,9 +4,10 @@ import java.io.{File, IOException}
 import javax.lang.model.element.Modifier
 
 import com.google.common.base.CaseFormat
+import com.google.common.base.CaseFormat.{LOWER_HYPHEN, UPPER_CAMEL}
 import com.navent.swagger.client.generator.Generator.Config
-import com.navent.swagger.client.implementation.Controller
-import com.squareup.javapoet.{JavaFile, TypeSpec}
+import com.navent.swagger.client.implementation.{Controller, Controllers}
+import com.squareup.javapoet.{ClassName, JavaFile, MethodSpec, TypeSpec}
 import io.swagger.models.{HttpMethod, Operation, _}
 
 import scala.collection.JavaConverters._
@@ -15,7 +16,7 @@ object PathGenerator {
 
   case class InternalOperation(url: String, method: HttpMethod, operation: Operation)
 
-  def generate(swagger: Swagger)(implicit config: Config): Unit = {
+  def generate(swagger: Swagger)(implicit config: Config): Iterable[TypeSpec] = {
     swagger.getPaths.asScala
       .flatMap({
         case (url: String, path: Path) =>
@@ -27,11 +28,8 @@ object PathGenerator {
       })
       .map({
         case (controllerName: String, operations: Iterable[InternalOperation]) =>
-          val generatedController = createController(controllerName, operations)
-          config.generatedControllers(controllerName) = generatedController
-          generatedController
+          createController(controllerName, operations)
       })
-      .foreach(typeSpec => writeToFile(typeSpec))
   }
 
   private def mapToOperations(url: String, path: Path): Iterable[InternalOperation] =
@@ -52,12 +50,19 @@ object PathGenerator {
       .addMethods(operations.flatMap({
         e: InternalOperation => MethodGenerator.generate(e)
       }).asJava)
+      .addMethod(MethodSpec.constructorBuilder()
+        .addModifiers(Modifier.PUBLIC)
+        .addParameter(ClassName.get(config.configPackage, LOWER_HYPHEN
+          .to(UPPER_CAMEL, config.serviceName) + "ClientConfiguration"), "config")
+        .addStatement("super(config)")
+        .build)
       .build
 
   private def writeToFile(t: TypeSpec)(implicit config: Config): Unit = {
     try
       JavaFile.builder(config.controllerPackage, t)
         .indent("\t")
+        .addStaticImport(classOf[Controllers], "*")
         .build.writeTo(new File(config.codeOutput))
     catch {
       case e: IOException =>

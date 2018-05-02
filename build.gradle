@@ -16,6 +16,10 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
 
+    dependencies {
+        compile group: 'org.springframework.boot', name: 'spring-boot', version: springBootVersion
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
