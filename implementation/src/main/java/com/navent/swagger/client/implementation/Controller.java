@@ -21,7 +21,7 @@ public abstract class Controller {
 	}
 
 	protected Http http() {
-		return config.getHttp();
+		return config.http();
 	}
 
 	protected <T> T resolveFuture(Future<T> future) throws InterruptedException, ExecutionException, TimeoutException {

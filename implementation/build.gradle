@@ -15,13 +15,30 @@ dependencies {
     compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
     // Riptide
-    compile group: 'org.zalando', name: 'riptide-core', version: riptideVersion
-    compile group: 'org.zalando', name: 'riptide-capture', version: riptideVersion
     compile group: 'org.zalando', name: 'riptide-timeout', version: riptideVersion
+    compile group: 'org.zalando', name: 'riptide-failsafe', version: riptideVersion
+    compile group: 'org.zalando', name: 'riptide-faults', version: riptideVersion
+    compile group: 'org.zalando', name: 'riptide-backup', version: riptideVersion
+    compile group: 'org.zalando', name: 'riptide-metrics', version: riptideVersion
+    compile group: 'org.zalando', name: 'riptide-spring-boot-starter', version: riptideVersion
+    if (ext.has("logbook") && ext.logbook.has("version"))
+        compile group: 'org.zalando', name: 'logbook-spring-boot-starter', version: ext.logbook.version
+    if (ext.has("tracer") && ext.tracer.has("version"))
+        compile group: 'org.zalando', name: 'tracer-spring-boot-starter', version: ext.tracer.version
+    if (ext.has("stups-http-components-oauth2") && ext['stups-http-components-oauth2'].has("version"))
+        compile group: 'org.zalando.stups', name: 'stups-http-components-oauth2', version: ext['stups-http-components-oauth2'].version
+    if (ext.has("tokens") && ext.tokens.has("version"))
+        compile group: 'org.zalando.stups', name: 'tokens', version: ext.tokens.version
 
     // Javax Validation
     compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
 
     // Test
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
