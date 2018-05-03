@@ -1,6 +1,5 @@
 package com.navent.swagger.client.generator
 
-import java.io.File
 import javax.lang.model.element.Modifier
 
 import com.navent.swagger.client.generator.Generator.Config
@@ -26,13 +25,13 @@ object ModelGenerator {
 
     val javadocBuilder = CodeBlock.builder()
 
-    if(StringUtils.isNotBlank(model.getTitle))
+    if (StringUtils.isNotBlank(model.getTitle))
       javadocBuilder.add("Title: $L\n", model.getTitle)
 
-    if(StringUtils.isNotBlank(model.getDescription))
+    if (StringUtils.isNotBlank(model.getDescription))
       javadocBuilder.add("$L\n", model.getDescription)
 
-    if(model.getExample != null)
+    if (model.getExample != null)
       javadocBuilder.add("Example: $L\n", model.getExample)
 
     builder.addJavadoc(javadocBuilder.build())
@@ -43,9 +42,5 @@ object ModelGenerator {
     })
 
     builder.build
-  }
-
-  private def writeToFile(t: TypeSpec)(implicit config: Config): Unit = {
-    JavaFile.builder(config.modelPackage, t).build.writeTo(new File(config.codeOutput))
   }
 }

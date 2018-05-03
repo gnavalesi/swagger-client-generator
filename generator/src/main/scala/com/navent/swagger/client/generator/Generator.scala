@@ -4,6 +4,7 @@ import java.io.{File, IOException, PrintWriter}
 
 import com.navent.swagger.client.implementation.Controllers
 import com.squareup.javapoet.{JavaFile, TypeSpec}
+import io.swagger.models.Swagger
 import io.swagger.parser.SwaggerParser
 
 import scala.collection.mutable
@@ -13,29 +14,33 @@ object Generator {
   def main(args: Array[String]): Unit = {
     parser.parse(args, Config()) match {
       case Some(config) => generate(config)
-
       case None =>
     }
   }
 
   private def generate(implicit config: Config): Unit = {
-    val swagger = new SwaggerParser().read(config.specification.getPath)
+    Option.apply(new SwaggerParser().read(config.specification))
+      .foreach({
+        case swagger: Swagger =>
+          ModelGenerator.generate(swagger).foreach(t => {
+            config.generatedModels += (t.name -> t)
+            writeToFile(JavaFile.builder(config.modelPackage, t))
+          })
 
-    val models = ModelGenerator.generate(swagger)
-    models.foreach(t => {
-      config.generatedModels += (t.name -> t)
-      writeToFile(JavaFile.builder(config.modelPackage, t))
-    })
+          PathGenerator.generate(swagger).foreach(p => {
+            config.generatedControllers += (p.name -> p)
+            writeToFile(JavaFile.builder(config.controllerPackage, p)
+              .addStaticImport(classOf[Controllers], "*"))
+          })
 
-    val paths = PathGenerator.generate(swagger)
-    paths.foreach(p => {
-      config.generatedControllers += (p.name -> p)
-      writeToFile(JavaFile.builder(config.controllerPackage, p)
-        .addStaticImport(classOf[Controllers], "*"))
-    })
+          ContextGenerator.generate(swagger).foreach(c => {
+            writeToFile(JavaFile.builder(config.configPackage, c))
+          })
 
-    ContextGenerator.generate(swagger)
-    GradleGenerator.generate
+          writeToFile("gradle.build", GradleGenerator.generate)
+        case _ =>
+          throw new RuntimeException(s"Unable to parse ${config.specification}")
+      })
   }
 
   case class Config(
@@ -43,7 +48,7 @@ object Generator {
                      serviceName: String = "",
 
                      // Input Options
-                     specification: File = new File("."),
+                     specification: String = "",
 
                      // Java Options
                      basePackage: String = "",
@@ -83,9 +88,9 @@ object Generator {
       .action((x, c) => c.copy(version = x))
       .text("version is a required string property")
 
-    opt[File]('s', "specification").required().valueName("<specification>")
+    opt[String]('s', "specification").required().valueName("<specification>")
       .action((x, c) => c.copy(specification = x))
-      .text("specification is a required file property")
+      .text("specification is a required string property")
 
     opt[String]('o', "output").required().valueName("<output>")
       .action((x, c) => {

@@ -1,6 +1,5 @@
 package com.navent.swagger.client.generator
 
-import java.io.File
 import javax.lang.model.element.Modifier
 
 import com.google.common.base.CaseFormat._
@@ -17,27 +16,12 @@ import scala.collection.JavaConverters._
 
 object ContextGenerator {
 
-  def generate(swagger: Swagger)(implicit config: Config): Unit = {
-
-    //    generateConfig(swagger)
-    //    generateRestClientConfig(swagger)
-    generateRestClientConfiguration(swagger)
+  def generate(swagger: Swagger)(implicit config: Config): Iterable[TypeSpec] = {
+    Seq(generateRestClientConfiguration(swagger))
   }
 
-  //  private def generateRestClientConfig(swagger: Swagger)(implicit config: Config): Unit = {
-  //    JavaFile.builder(config.configPackage, TypeSpec
-  //      .classBuilder(getClassName("ClientConfig"))
-  //      .addModifiers(Modifier.PUBLIC)
-  //      .addAnnotation(AnnotationSpec.builder(classOf[ConfigurationProperties])
-  //        .addMember("prefix", "$S", config.serviceName)
-  //        .build)
-  //      .superclass(classOf[RestClientConfig]).build)
-  //      .build.writeTo(new File(config.codeOutput))
-  //  }
-
-  private def generateRestClientConfiguration(swagger: Swagger)(implicit config: Config): Unit = {
-    JavaFile.builder(config.configPackage, TypeSpec
-      .classBuilder(getClassName("ClientConfiguration"))
+  private def generateRestClientConfiguration(swagger: Swagger)(implicit config: Config): TypeSpec = {
+    TypeSpec.classBuilder(getClassName("ClientConfiguration"))
       .addModifiers(Modifier.PUBLIC)
       .superclass(classOf[RestClientConfiguration])
       .addField(FieldSpec.builder(ClassName.get(classOf[Http]), "client", Modifier.PRIVATE) // Http Bean
@@ -49,8 +33,8 @@ object ContextGenerator {
       .addField(FieldSpec.builder(TypeName.LONG, "futureTimeout", Modifier.PRIVATE) // Futures timeout
         .addAnnotation(classOf[Getter])
         .addAnnotation(AnnotationSpec.builder(classOf[Value])
-        .addMember("value", "$S", "${riptide.clients." + config.serviceName + ".connection-time-to-live:30l}")
-        .build())
+          .addMember("value", "$S", "${riptide.clients." + config.serviceName + ".connection-time-to-live:30l}")
+          .build())
         .build)
       .addMethod(MethodSpec.methodBuilder("http") // Http Method
         .returns(ClassName.get(classOf[Http]))
@@ -67,8 +51,7 @@ object ContextGenerator {
           .addStatement("return new $T(this)", ClassName.get(config.controllerPackage, c))
           .build
       }).asJava)
-      .build)
-      .build.writeTo(new File(config.codeOutput))
+      .build
   }
 
   private def getClassName(suffix: String)(implicit config: Config): String = {

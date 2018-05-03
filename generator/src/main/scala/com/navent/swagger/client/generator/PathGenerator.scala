@@ -1,13 +1,12 @@
 package com.navent.swagger.client.generator
 
-import java.io.{File, IOException}
 import javax.lang.model.element.Modifier
 
 import com.google.common.base.CaseFormat
 import com.google.common.base.CaseFormat.{LOWER_HYPHEN, UPPER_CAMEL}
 import com.navent.swagger.client.generator.Generator.Config
-import com.navent.swagger.client.implementation.{Controller, Controllers}
-import com.squareup.javapoet.{ClassName, JavaFile, MethodSpec, TypeSpec}
+import com.navent.swagger.client.implementation.Controller
+import com.squareup.javapoet.{ClassName, MethodSpec, TypeSpec}
 import io.swagger.models.{HttpMethod, Operation, _}
 
 import scala.collection.JavaConverters._
@@ -57,16 +56,4 @@ object PathGenerator {
         .addStatement("super(config)")
         .build)
       .build
-
-  private def writeToFile(t: TypeSpec)(implicit config: Config): Unit = {
-    try
-      JavaFile.builder(config.controllerPackage, t)
-        .indent("\t")
-        .addStaticImport(classOf[Controllers], "*")
-        .build.writeTo(new File(config.codeOutput))
-    catch {
-      case e: IOException =>
-        e.printStackTrace()
-    }
-  }
 }
